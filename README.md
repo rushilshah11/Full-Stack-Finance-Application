@@ -125,6 +125,6 @@ This logic ensures that portfolio metrics are accurate and reflect real-world fi
 
 ## 🧑‍💻 Author
 **Rushil Shah**  
-📫 [LinkedIn]([url](https://linkedin.com/in/rushilshahh)) 
+📫 [LinkedIn](https://linkedin.com/in/rushilshahh)
 💼 Portfolio
 
