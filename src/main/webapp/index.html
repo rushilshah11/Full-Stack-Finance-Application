@@ -1,0 +1,283 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>JoesStocks</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<script>
+    function displayNav() {
+        var navbarContainer = document.getElementById("navbar");
+
+        if (localStorage.getItem("user") === null) {
+        	//“How can I display raw html inside script tags” prompt (6 lines).
+        	//ChatGPT, 4 Sep. version, OpenAI, 21 Apr. 2024, chat.openai.com/chat.
+            navbarContainer.innerHTML = `
+	            <div class="navbarGuest" id="navbarGuest">
+	                <a class="navbarLink" href="index.html">Joes Stocks</a>
+	                <a class="navbarLink rightAlign" href="login.html">Login / Sign Up</a>
+	                <a class="navbarLink rightAlign" href="index.html">Home / Search</a>
+	            </div>`;
+        } else {
+            navbarContainer.innerHTML = `
+	            <div class="navbarUser" id="navbarUser">
+	                <a class="navbarLink" href="index.html">Joes Stocks</a>
+	                <a class="navbarLink rightAlign" href="index.html" onclick="logout()">Logout</a>
+	                <a class="navbarLink rightAlign" href="portfolio.html">Portfolio</a>
+	                <a class="navbarLink rightAlign" href="index.html">Home / Search</a>
+	            </div>`;
+        }
+    }
+
+    window.onload = displayNav;
+
+    function logout() {
+        localStorage.removeItem("user");
+    }
+
+    function processBuy() {
+        var ticker = document.getElementById("tickerU").innerHTML;
+        var quantity = document.getElementById("userQuantity").value;
+        var price = document.getElementById("lastPriceU").innerHTML;
+        var user = JSON.parse(localStorage.getItem("user"));
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "TradeServelet");
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {
+                alert(xhr.responseText);
+            }
+        };
+
+        //encodeURIComponent came from lab. TA helped me debug a similar issue I ran into during this program
+        var data = "ticker=" + encodeURIComponent(ticker) + "&quantity=" + encodeURIComponent(quantity) + "&price=" + encodeURIComponent(price) + "&user=" + encodeURIComponent(JSON.stringify(user));
+        xhr.send(data);
+        return false;
+    }
+
+
+    function submitTicker() {
+
+        var ticker = document.getElementById("userTicker").value;
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "HomeServelet?userTicker=" + ticker);
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                displayTicker(xhr.responseText);
+            }
+        };
+
+        xhr.send();
+        return false;
+    }
+
+    function displayTicker(response) {
+
+
+        var data = JSON.parse(response);
+
+
+        var finnHubObject = data.finnHubObject;
+        var finnHubDescription = data.finnHubDescription;
+
+        if (localStorage.getItem("user") === null) {
+			////“How do I populate a div from scriptTag” prompt (6 lines).
+  			//ChatGPT, 4 Sep. version, OpenAI, 21 Apr. 2024, chat.openai.com/chat.
+            var ticker = document.getElementById("ticker");
+            ticker.innerHTML = finnHubDescription.ticker;
+            var name = document.getElementById("name");
+            name.innerHTML = finnHubDescription.name;
+            var market = document.getElementById("market");
+            market.innerHTML = finnHubDescription.exchange;
+
+            var highPrice = document.getElementById("highPrice");
+            highPrice.innerHTML = "High Price: " + finnHubObject.h;
+            var lowPrice = document.getElementById("lowPrice");
+            lowPrice.innerHTML = "Low Price: " + finnHubObject.l;
+            var openPrice = document.getElementById("openPrice");
+            openPrice.innerHTML = "Open Price: " + finnHubObject.o;
+            var closePrice = document.getElementById("closePrice");
+            closePrice.innerHTML = "Close Price: " + finnHubObject.c;
+
+            var IPO = document.getElementById("IPO");
+            IPO.innerHTML = "<strong>IPO: </strong>" + finnHubDescription.ipo;
+            var marketCap = document.getElementById("marketCap");
+            marketCap.innerHTML = "<strong>Market Cap ($M): </strong>" + finnHubDescription.marketCapitalization;
+            var shareOutstanding = document.getElementById("shareOutstanding");
+            shareOutstanding.innerHTML = "<strong>Share Outstanding: </strong>" + finnHubDescription.shareOutstanding;
+            var website = document.getElementById("website");
+            website.innerHTML = "<strong>Website: </strong>" + finnHubDescription.weburl;
+            var phone = document.getElementById("phone");
+            phone.innerHTML = "<strong>Phone: </strong>" + finnHubDescription.phone;
+
+            var summary = document.getElementById("summary");
+            var companyInfo = document.getElementById("companyInfo");
+            summary.innerHTML = "Summary";
+            companyInfo.innerHTML = "Company Information";
+
+            var tickerGuest = document.querySelector('.tickerGuest');
+            tickerGuest.style.display = "block";
+            var searchContainer = document.getElementsByClassName("searchContainer")[0];
+            searchContainer.style.display = "none";
+        } else {
+ 
+            var ticker = document.getElementById("tickerU");
+            ticker.innerHTML = finnHubDescription.ticker;
+            var name = document.getElementById("nameU");
+            name.innerHTML = finnHubDescription.name;
+            var market = document.getElementById("marketU");
+            market.innerHTML = finnHubDescription.exchange;
+            var quantity = document.getElementById("quantityU");
+            quantity.className = "quantityU";
+            quantity.innerHTML = "<div>Quantity: <input type='text' id='userQuantity' class='quantityInput' name='userQuantity'></input></div>" + "<div><button type='button' value='Submit' onclick='processBuy()' class='quantityButton' id='quantityButton'>BUY</button></div>";
+
+            var lasPrice = document.getElementById("lastPriceU");
+            lasPrice.innerHTML = finnHubObject.c;
+            var change = document.getElementById("changeU");
+            var changePercent = document.getElementById("changePercentU");
+            var currTimeStamp = document.getElementById("currTimeStampU");
+            currTimeStamp.innerHTML = new Date().toLocaleString();
+
+            if (finnHubObject.d > 0) {
+                change.innerHTML = '<i class="fa-solid fa-caret-up"></i>' + finnHubObject.d + " (" + finnHubObject.dp + "%)";
+                document.querySelector('.right').classList.add('green');
+            } else {
+                change.innerHTML = '<i class="fa-solid fa-caret-down"></i>' + finnHubObject.d + " (" + finnHubObject.dp + "%)";
+                document.querySelector('.right').classList.add('red');
+            }
+
+            var marketStatus = document.getElementById("marketStatusU");
+            marketStatus.innerHTML = "Market is Open";
+
+            var highPrice = document.getElementById("highPriceU");
+            highPrice.innerHTML = "<strong>High Price: " + finnHubObject.h + "</strong>";
+            var lowPrice = document.getElementById("lowPriceU");
+            lowPrice.innerHTML = "<strong>Low Price: " + finnHubObject.l + "</strong>";
+            var openPrice = document.getElementById("openPriceU");
+            openPrice.innerHTML = "<strong>Open Price: " + finnHubObject.o + "</strong>";
+            var closePrice = document.getElementById("closePriceU");
+            closePrice.innerHTML = "<strong>Close Price: " + finnHubObject.c + "</strong>";
+
+            var IPO = document.getElementById("IPOU");
+            IPO.innerHTML = "<strong>IPO: </strong>" + finnHubDescription.ipo;
+            var marketCap = document.getElementById("marketCapU");
+            marketCap.innerHTML = "<strong>Market Cap ($M): </strong>" + finnHubDescription.marketCapitalization;
+            var shareOutstanding = document.getElementById("shareOutstandingU");
+            shareOutstanding.innerHTML = "<strong>Share Outstanding: </strong>" + finnHubDescription.shareOutstanding;
+            var website = document.getElementById("websiteU");
+            website.innerHTML = "<strong>Website: </strong>" + finnHubDescription.weburl;
+            var phone = document.getElementById("phoneU");
+            phone.innerHTML = "<strong>Phone: </strong>" + finnHubDescription.phone;
+
+            var summary = document.getElementById("summaryU");
+            var companyInfo = document.getElementById("companyInfoU");
+            summary.innerHTML = "Summary";
+            companyInfo.innerHTML = "Company Information";
+
+            var tickerUser = document.querySelector('.tickerUser');
+            tickerUser.style.display = "block";
+            var searchContainer = document.getElementsByClassName("searchContainer")[0];
+            searchContainer.style.display = "none";
+        }
+
+
+
+    }
+
+</script>
+
+<body>
+    <div class="navbar" id="navbar"></div>
+
+    <div class="searchContainer">
+        <div class="title">
+            <h1>Search Stocks</h1>
+        </div>
+        <div class="searchBar">
+            <input type="text" id="userTicker" name="userTicker" placeholder="Search by ticker..." required>
+            <button type="button" value="Submit" onclick="submitTicker()" class="searchButton"><i
+                    class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+    </div>
+
+    <div class="tickerGuest">
+        <div class="ticker" id="ticker"></div>
+        <div class="name" id="name"></div>
+        <div class="market" id="market"></div>
+        <div class="quantity" id="quantity"></div>
+
+
+        <div class="lastPrice" id="lastPrice"></div>
+        <div class="change" id="change"></div>
+        <div class="changePercent" id="changePercent"></div>
+        <div class="currTimeStamp" id="currTimeStamp"></div>
+
+
+        <div class="marketStatus" id="marketStatus"></div>
+        <div class="summary" id="summary"></div>
+        <hr>
+
+        <div class="highPrice" id="highPrice"></div>
+        <div class="lowPrice" id="lowPrice"></div>
+        <div class="openPrice" id="openPrice"></div>
+        <div class="closePrice" id="closePrice"></div>
+        <hr>
+
+        <div class="companyInfo" id="companyInfo"></div>
+        <div class="IPO" id="IPO"></div>
+        <div class="marketCap" id="marketCap"></div>
+        <div class="shareOutstanding" id="shareOutstanding"></div>
+        <div class="website" id="website"></div>
+        <div class="phone" id="phone"></div>
+    </div>
+
+    <div class="tickerUser">
+
+        <div class="userContainer">
+            <div class="left">
+                <div class="tickerU" id="tickerU"></div>
+                <div class="nameU" id="nameU"></div>
+                <div class="marketU" id="marketU"></div>
+                <div class="quantityU" id="quantityU"></div>
+            </div>
+            <div class="right">
+                <div class="lastPriceU" id="lastPriceU"></div>
+                <div>
+                    <span class="changeU" id="changeU">
+                    </span>
+
+                </div>
+
+                <div class="currTimeStampU" id="currTimeStampU"></div>
+            </div>
+        </div>
+
+        <div class="marketStatus" id="marketStatusU"></div>
+        <div class="summary" id="summaryU"></div>
+        <hr>
+
+        <div class="highPrice" id="highPriceU"></div>
+        <div class="lowPrice" id="lowPriceU"></div>
+        <div class="openPrice" id="openPriceU"></div>
+        <div class="closePrice" id="closePriceU"></div>
+        <hr>
+
+        <div class="companyInfo" id="companyInfoU"></div>
+        <div class="IPO" id="IPOU"></div>
+        <div class="marketCap" id="marketCapU"></div>
+        <div class="shareOutstanding" id="shareOutstandingU"></div>
+        <div class="website" id="websiteU"></div>
+        <div class="phone" id="phoneU"></div>
+    </div>
+
+
+</body>
+
+
+</html>

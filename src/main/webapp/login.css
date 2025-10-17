@@ -1,0 +1,46 @@
+/* login.css */
+* {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+h3 {
+  font-size: 20px;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+}
+.login-box,
+.signup-box {
+  padding: 20px;
+  margin: 10px;
+  width: 350px; /* Adjust the width as needed */
+}
+.textbox {
+  margin-bottom: 15px;
+}
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* “How do i target a specific element to style in my input form” prompt (2 lines).
+    ChatGPT, 4 Sep. version, OpenAI, 21 Apr. 2024, chat.openai.com/chat. */
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 2px solid black;
+}
+.submitButton {
+  text-align: center;
+  width: 375px; /* Adjust the width as needed */
+  padding: 10px;
+  border: 2px solid black;
+  border-radius: 10px;
+  background: maroon;
+  color: white;
+  cursor: pointer;
+}

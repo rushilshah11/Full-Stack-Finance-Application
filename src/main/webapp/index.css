@@ -1,0 +1,260 @@
+* {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.navbarGuest {
+  background-color: #8080f7;
+  padding: 20px;
+}
+
+.navbarUser {
+  background-color: #8080f7;
+  padding: 20px;
+  margin-bottom: 15px;
+}
+
+.navbarLink {
+  color: white;
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: bold;
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+.rightAlign {
+  float: right;
+}
+.pageContainer {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
+
+.searchContainer {
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.title .h1{
+  color: black;
+  padding-bottom: 50px;
+  font-size: 20px;
+}
+
+.searchBar {
+  margin-top: 10px;
+}
+
+
+/* “How do i target a specific element to style in my input form” prompt (1 lines).
+    ChatGPT, 4 Sep. version, OpenAI, 21 Apr. 2024, chat.openai.com/chat. */
+.searchBar input[type="text"] {
+  border-color: #8080f7;
+  border-radius: 5px;
+  color: black;
+  width: 70%;
+  padding: 5px
+}
+
+
+/* “How do i target a specific element to style in my input form” prompt (1 lines).
+    ChatGPT, 4 Sep. version, OpenAI, 21 Apr. 2024, chat.openai.com/chat. */
+.searchBar input[type="text"]:focus {
+  border-color: #8080f7;
+}
+
+.searchBar .searchButton {
+  color: white;
+  border-color: #8080f7;
+  background-color: #8080f7;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.tickerGuest {
+  margin-top: 10px;
+  margin-left: 20%;
+  margin-right: 20%;
+  display: none;
+}
+
+.ticker {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 3px;
+}
+
+.tickerU {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 3px;
+}
+
+.name {
+  text-align: center;
+  margin: 3px;
+}
+
+.nameU {
+  margin: 3px;
+}
+
+.market {
+  text-align: center;
+  margin: 3px;
+}
+
+.marketU {
+  margin: 3px;
+}
+
+.quantityU {
+  margin-top: 5px;
+}
+
+.quantityButton {
+  background-color: green;
+  color: white;
+  cursor: pointer;
+  padding: 3px;
+}
+
+.quantityInput {
+  width: 25px;
+}
+
+.userContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.left {
+  flex: 1;
+}
+
+.right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.lastPriceU {
+  text-align: right;
+  margin: 3px;
+  position: relative;
+  font-size: 30px;
+}
+
+.changeU {
+  text-align: right;
+  margin: 3px;
+  position: relative;
+  font-size: 25px;
+}
+
+.changePercentU {
+  text-align: right;
+  margin: 3px;
+  position: relative;
+  font-size: 25px;
+}
+
+.currTimeStampU {
+  text-align: right;
+  margin: 3px;
+  position: relative;
+}
+
+.marketStatusU {
+  text-align: center;
+  padding: 10px;
+  padding-right: 50px;
+  padding-left: 50px;
+}
+
+.marketStatus {
+  text-align: center;
+  padding: 10px;
+  padding-right: 50px;
+  padding-left: 50px;
+}
+
+.summary {
+  text-align: center;
+  padding: 10px;
+  padding-right: 50px;
+  padding-left: 50px;
+}
+
+.highPrice {
+  text-align: center;
+  margin: 10px;
+}
+
+.lowPrice {
+  text-align: center;
+  margin: 10px;
+}
+
+.openPrice {
+  text-align: center;
+  margin: 10px;
+}
+
+.closePrice {
+  text-align: center;
+  margin: 10px;
+}
+
+.companyInfo {
+  text-align: center;
+  padding: 10px;
+  padding-right: 50px;
+  padding-left: 50px;
+}
+
+.IPO {
+  margin: 10px;
+}
+
+.marketCap {
+  margin: 10px;
+}
+
+.shareOutstanding {
+  margin: 10px;
+}
+
+.website {
+  margin: 10px;
+}
+
+.phone {
+  margin: 10px;
+}
+
+.tickerUser {
+  display: none;
+  margin-top: 10px;
+
+  margin-left: 10%;
+  margin-right: 10%;
+  display: none;
+}
+
+.green {
+  color: green;
+}
+
+.red {
+  color: red;
+}

@@ -1,0 +1,154 @@
+<!-- login html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" type="text/css" href="login.css">
+    <link rel="stylesheet" type="text/css" href="index.css">
+</head>
+<script>
+    function loginSubmit() {
+        var form = document.forms[0]; 
+
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "LoginServelet");
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                if (xhr.status == 200) {
+                    processLoginSubmit(xhr.responseText);
+                }
+                else {
+                    alert(xhr.responseText);
+                }
+            }
+
+
+        };
+
+        var formData = new FormData(form);
+        var data = "username=" + encodeURIComponent(formData.get('username')) + "&password=" + encodeURIComponent(formData.get('password'));
+        xhr.send(data);
+    }
+
+    function signupSubmit() {
+        var form = document.forms[1]; 
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "SignupServelet");
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        xhr.onload = function () {
+
+            if (xhr.status == 200) {
+                console.log(xhr.responseText);
+                processSignupSubmit(xhr.responseText);
+            }
+        };
+
+        var formData = new FormData(form);
+
+      	//“How do I verify an email using regex in javascript” prompt (5 lines).
+        //ChatGPT, 4 Sep. version, OpenAI, 21 Apr. 2024, chat.openai.com/chat.
+        var emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if (!emailRegex.test(formData.get('email'))) {
+            alert("Invalid email");
+            return;
+        }
+
+        if (formData.get('password2') !== formData.get('confirmPassword')) {
+            alert("Passwords do not match");
+            return;
+        }
+
+
+        var data = "email=" + encodeURIComponent(formData.get('email')) +
+            "&username2=" + encodeURIComponent(formData.get('username2')) +
+            "&password2=" + encodeURIComponent(formData.get('password2')) +
+            "&confirmPassword=" + encodeURIComponent(formData.get('confirmPassword'));
+
+        xhr.send(data);
+
+    }
+
+    function processLoginSubmit(response) {
+        //make user object and parse response using gson
+
+        var user = JSON.parse(response);
+
+        localStorage.setItem("user", JSON.stringify(user));
+        window.location.href = "index.html";
+
+    }
+    function processSignupSubmit(response) {
+        var user = JSON.parse(response);
+
+        localStorage.setItem("user", JSON.stringify(user));
+        window.location.href = "index.html";
+    }
+
+
+</script>
+
+<body>
+    <div class="navbarGuest">
+        <a class="navbarLink" href="index.html">Joes Stocks</a>
+        <a class="navbarLink rightAlign" href="login.html">Login / Sign Up</a>
+        <a class="navbarLink rightAlign" href="index.html">Home / Search</a>
+    </div>
+
+    <div class="container">
+        <div class="login-box">
+            <h3>Login</h3>
+            <form>
+                <div class="textbox">
+                    <label for="username">Username: </label>
+                    <br>
+                    <input type="text" name="username" id="username" required>
+                </div>
+                <div class="textbox">
+                    <label for="password">Password: </label>
+                    <br>
+                    <input type="password" name="password" id="password" required>
+                </div>
+                <div>
+                    <button class="submitButton" type="button" value="Submit" onclick="loginSubmit()">Submit</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="signup-box">
+            <h3>Sign Up</h3>
+            <form>
+                <div class="textbox">
+                    <label for="email">Email: </label>
+                    <br>
+                    <input type="text" name="email" id="email" required>
+                </div>
+                <div class="textbox">
+                    <label for="username">Username: </label>
+                    <br>
+                    <input type="text" name="username2" id="username2" required>
+                </div>
+                <div class="textbox">
+                    <label for="password">Password: </label>
+                    <br>
+                    <input type="password" name="password2" id="password2" required>
+                </div>
+                <div class="textbox">
+                    <label for="confirmPassword">Confirm Password: </label>
+                    <br>
+                    <input type="password" name="confirmPassword" id="confirmPassword" required>
+                </div>
+                <div>
+                    <button class="submitButton" type="button" value="Submit" onclick="signupSubmit()">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

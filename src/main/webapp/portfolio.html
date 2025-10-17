@@ -1,0 +1,282 @@
+<!-- portfolio html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Portfolio</title>
+    <link rel="stylesheet" type="text/css" href="portfolio.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<script>
+    function logout() {
+        localStorage.removeItem("user");
+    }
+
+    function loadPortfolio() {
+
+        var user = JSON.parse(localStorage.getItem("user"));
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "PortfolioServlet");
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                displayInfo(xhr.responseText);
+            }
+        };
+
+        var data = "user=" + encodeURIComponent(JSON.stringify(user));
+        xhr.send(data);
+        return false;
+    }
+    window.onload = function () {
+        getBalance();
+        loadPortfolio();
+    };
+
+
+    function getBalance() {
+        var user = JSON.parse(localStorage.getItem("user"));
+        var username = user.username;
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "PortfolioServlet?user=" + username);
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                displayBalance(xhr.responseText);
+            }
+        };
+
+        xhr.send();
+        return false;
+    }
+
+    //help from TA to display balance not based off localStorage, but from my database to get the most recent updated balance. 
+    function displayBalance(response) {
+
+        var cashBalance = document.getElementById("cashBalance");
+        cashBalance.innerHTML = "Cash Balance: $" + JSON.parse(response);
+
+        var user = JSON.parse(localStorage.getItem("user"));
+        var balanceString = response;
+        var balance = parseInt(balanceString);
+        user.balance = balance;
+        localStorage.setItem("user", JSON.stringify(user));
+    }
+
+  	//“I am dynamically displaying content from my databse. I need to add a form that is unique to each "box." How can I do this? ” prompt (1 lines).
+    //ChatGPT, 4 Sep. version, OpenAI, 21 Apr. 2024, chat.openai.com/chat.
+    
+    //Essentially with this issue, I was running into the problem where the user could only buy or sell the first stock listed in my databse. 
+    //It was not recognizing the third or fourth, etc stock. So I asked chatgpt and it said to make it a function that would allow for 
+    //event listening. That way a unique form is built for every box of information you have. 
+    function createForm(stock) {
+        var formDiv = document.createElement("div");
+        formDiv.className = "formDiv";
+
+        var form = document.createElement("form");
+
+        var qDiv = document.createElement("div");
+        qDiv.className = "quantityDiv";
+
+        var quantityLabel = document.createElement("label");
+        quantityLabel.innerHTML = "Quantity: ";
+        qDiv.appendChild(quantityLabel);
+
+        var quantityInput = document.createElement("input");
+        quantityInput.type = "text";
+        quantityInput.name = "quantity";
+        quantityInput.id = "userQuantity";
+        quantityInput.className = "formElement quantityInput";
+        qDiv.appendChild(quantityInput);
+
+        form.appendChild(qDiv);
+
+        var radioOptions = document.createElement("div");
+        radioOptions.className = "radioOptions";
+
+        var buyRadio = document.createElement("input");
+        buyRadio.type = "radio";
+        buyRadio.name = "transactionType";
+        buyRadio.value = "buy";
+        buyRadio.checked = true;
+        buyRadio.className = "formElement buyRadio";
+        radioOptions.appendChild(buyRadio);
+
+        var buyLabel = document.createElement("label");
+        buyLabel.innerHTML = "BUY";
+        radioOptions.appendChild(buyLabel);
+
+        var sellRadio = document.createElement("input");
+        sellRadio.type = "radio";
+        sellRadio.name = "transactionType";
+        sellRadio.value = "sell";
+        sellRadio.className = "formElement radioElement";
+        radioOptions.appendChild(sellRadio);
+
+        var sellLabel = document.createElement("label");
+        sellLabel.innerHTML = "SELL";
+        radioOptions.appendChild(sellLabel);
+
+        form.appendChild(radioOptions);
+
+        var submitButton = document.createElement("input");
+        submitButton.type = "button";
+        submitButton.value = "Submit";
+        submitButton.className = "submitButton";
+
+        submitButton.onclick = function () {
+            var stockContainer = this.closest('.stockBox');
+            var quantityInput = stockContainer.querySelector('.quantityInput').value;
+            var transactionType = stockContainer.querySelector('input[name="transactionType"]:checked').value;
+            var ticker = stock.symbol;
+            var user = JSON.parse(localStorage.getItem("user"));
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "TradeServlet2");
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    alert(xhr.responseText);
+                    location.reload();
+                }
+            };
+
+
+            var data = "user=" + encodeURIComponent(JSON.stringify(user)) + "&ticker=" + ticker + "&quantity=" + quantityInput + "&transactionType=" + transactionType;
+            xhr.send(data);
+            return false;
+        };
+
+        form.appendChild(submitButton);
+
+        formDiv.appendChild(form);
+
+        return formDiv;
+    }
+
+
+
+    function displayInfo(response) {
+
+        var user = JSON.parse(localStorage.getItem("user"));
+        var portfolio = JSON.parse(response);
+        if (portfolio.length === 0) {
+            alert("You have nothing in your portfolio");
+        }
+
+        var totalValue = user.balance;
+        for (var i = 0; i < portfolio.length; i++) {
+            var stock = portfolio[i];
+            var stockSymbol = stock.symbol;
+            var companyName = stock.companyName;
+            var stockQuantity = stock.quantity;
+            var averageCostPerShare = stock.average_cost_per_share;
+            var totalCost = stock.total_cost;
+            var change = stock.change;
+            var currentPrice = stock.currPrice;
+            var marketValue = stock.marketValue;
+            totalValue += marketValue;
+
+            var stockContainer = document.createElement("div");
+            stockContainer.className = "stockBox";
+            stockContainer.id = stockSymbol;
+
+            var stockHeader = document.createElement("div");
+            stockHeader.className = "stockHeader";
+            stockHeader.innerHTML = "<h3>" + stockSymbol + " - " + companyName + "</h3>";
+            stockContainer.appendChild(stockHeader);
+
+            var stockDetailsContainer = document.createElement("div");
+            stockDetailsContainer.className = "stockDetailsContainer";
+
+            var stockDetailsLeft = document.createElement("div");
+            stockDetailsLeft.className = "stockDetailsLeft";
+
+            var quantityElement = document.createElement("p");
+            quantityElement.className = "quantity";
+            quantityElement.innerHTML = "Quantity: " + stockQuantity;
+            stockDetailsLeft.appendChild(quantityElement);
+
+            var averageCostElement = document.createElement("p");
+            averageCostElement.className = "averageCost";
+            averageCostElement.innerHTML = "Avg. Cost/Share: " + averageCostPerShare;
+            stockDetailsLeft.appendChild(averageCostElement);
+
+            var totalCostElement = document.createElement("p");
+            totalCostElement.className = "totalCost";
+            totalCostElement.innerHTML = "Total Cost: $" + totalCost;
+            stockDetailsLeft.appendChild(totalCostElement);
+
+            stockDetailsContainer.appendChild(stockDetailsLeft);
+
+            var stockDetailsRight = document.createElement("div");
+            stockDetailsRight.className = "stockDetailsRight";
+
+            var changeElement = document.createElement("p");
+            changeElement.textContent = "Change: ";
+            if (change > 0) {
+                changeElement.innerHTML += "<span class='green'>" + '<i class="fa-solid fa-caret-up"></i>' + change + "</span>";
+            } else {
+                changeElement.innerHTML += "<span class='red'>" + '<i class="fa-solid fa-caret-down"></i>' + change + "</span>";
+            }
+            stockDetailsRight.appendChild(changeElement);
+
+            var currentPriceElement = document.createElement("p");
+            currentPriceElement.className = "currentPrice";
+            currentPriceElement.innerHTML = "Current Price: " + currentPrice;
+            stockDetailsRight.appendChild(currentPriceElement);
+
+            var marketValueElement = document.createElement("p");
+            marketValueElement.className = "marketValue";
+            marketValueElement.innerHTML = "Market Value: " + marketValue;
+            stockDetailsRight.appendChild(marketValueElement);
+
+            stockDetailsContainer.appendChild(stockDetailsRight);
+
+            stockContainer.appendChild(stockDetailsContainer);
+
+
+          	//“I am dynamically displaying content from my databse. I need to add a form that is unique to each "box." How can I do this? ” prompt (1 lines).
+            //ChatGPT, 4 Sep. version, OpenAI, 21 Apr. 2024, chat.openai.com/chat.
+            
+            //Essentially with this issue, I was running into the problem where the user could only buy or sell the first stock listed in my databse. 
+            //It was not recognizing the third or fourth, etc stock. So I asked chatgpt and it said to make it a function that would allow for 
+            //event listening. That way a unique form is built for every box of information you have. 
+            var formDiv = createForm(stock);
+
+            stockContainer.appendChild(formDiv);
+
+            document.getElementById("stockContainer").appendChild(stockContainer);
+        }
+
+        var totalValueElement = document.getElementById("totalValue");
+        totalValueElement.innerHTML = "Total Portfolio Value: $" + totalValue.toFixed(2);
+    }
+</script>
+
+<body>
+    <div class="navbarUser" id="navbarUser">
+        <a class="navbarLink" href="index.html">Joes Stocks</a>
+        <a class="navbarLink rightAlign" href="index.html" onclick="logout()">Logout</a>
+        <a class="navbarLink rightAlign" href="portfolio.html">Portfolio</a>
+        <a class="navbarLink rightAlign" href="index.html">Home / Search</a>
+    </div>
+
+    <div class="margins">
+        <h1 class="portfolio" id="portfolio">Portfolio</h1>
+
+        <h2 class="cashBalance" id="cashBalance"></h2>
+
+        <h2 class="totalValue" id="totalValue"></h2>
+
+        <div id="stockContainer" class="stockContainer"></div>
+    </div>
+
+
+
+
+
+</html>
